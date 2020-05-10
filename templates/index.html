@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <link rel="stylesheet" href="../static/style.css" />
+      <link rel="icon" type="image/png" href="../static/favicon.png">
+      <title>Image Search on image database PostgreSQL</title>
+  </head>
+
+
+  <body>
+    <div class="container">
+      <img src="../static/logo.png" alt="Python Flask PostgreSQL Heroku" class="logo" />
+      {% if message %}
+      <p class="message">{{ message | safe }}</p>
+      {% endif %}
+
+
+      <form action="/submit" method="POST" enctype="multipart/form-data">
+
+          <div class="form-group">
+              <h2>Select image features</h2>
+              <label for="sift_descr">
+                  <input type="radio" id="sift_descr" name="descriptor_or_histogram"  value="sift_descr"  checked="checked"/>
+                  SIFT descriptor
+              </label>
+
+              <label for="hist">
+                  <input type="radio" id="hist" name="descriptor_or_histogram" value="hist"/>
+                  Histogram
+              </label>
+
+              <label for="sift_bovw">
+                  <input type="radio" id="sift_bovw" name="descriptor_or_histogram" value="sift_bovw"/>
+                  SIFT with BOVW
+              </label>
+            </div>
+
+
+
+          <div class="form-group">
+
+              <h2>Insert an image</h2>
+              <label for="chkImage">
+                  <input type="radio" id="chkImage" name="chk"  checked="checked"  onclick="ShowHideDiv()" />
+                  Image file
+              </label>
+              <label for="chkImageDescr">
+                  <input type="radio" id="chkImageDescr" name="chk" onclick="ShowHideDiv()" />
+                  Image vector
+              </label>
+
+
+              <div id="img_input_method" style="transition: opacity 2s;">
+                  <h3>Select an image</h3>
+                  <input
+                          type="file"
+                          name="img"
+                          accept="image/*"
+                  />
+              </div>
+              <div id="img_des_input_method"  style="transition: opacity 2s; opacity: 0; height: 0; overflow: hidden;">
+                  <h3>! ADVANCED INPUT METHOD !</h3>
+                  <h4>SIFT vector (size: 128x128)  OR  Histogram (size: [8x8x8]) </h4>
+                  <h4>[SIFT with BOVW -> use Image file as input method]</h4>
+                  <h4>SIFT vectors MUST be summed by each individual column (1x128)</h4>
+                  <h4>(final RECOMMENDED size) -> 128 OR 512</h4>
+                  <h4>ONLY numbers</h4>
+                  <h4>Input example:</h4>
+                  <h4>[1.0, 8.0, 149.0, 11.0, 0.0]</h4>
+                  <input
+                          id="vector_field"
+                          name="image_descriptor"
+                          placeholder="Give SIFT vector or Histogram of an image (flattened)"
+                  />
+              </div>
+        </div>
+
+
+
+        <div class="form-group">
+          <h2>Distance Metric</h2>
+          <select name="distance_metric">
+            <option value="">Select Distance Metric</option>
+            <option value="euclidean">euclidean</option>
+            <option value="cityblock">cityblock</option>
+            <option value="chebyshev">chebyshev</option>
+            <option value="jaccard">jaccard</option>
+            <option value="cosine">cosine</option>
+          </select>
+        </div>
+
+
+
+        <div class="form-group">
+          <h2>Select the number (k) of most similar results to return</h2>
+                  <input
+                          id="k_field"
+                          type='number'
+                          step="1"
+                          min="1"
+                          name="get_k_results"
+                          placeholder="Give the number of results (k)"
+                          required
+                  />
+        </div>
+
+
+
+        <input type="submit" value="Submit" class="btn" />
+
+
+
+        {% if results %}
+            <h1>Query results</h1>
+            <div class="form-group">
+                {% for i in results %}
+                    <h1>{{ vector_method }}:</h1>
+                    <h2>{{ i[0] }}</h2>
+                    <h2><img class="result_images" src="{{ i[1] }}" alt="{{ i[1] }}"></h2>
+                    <h2><a href="{{ i[1] }}">{{ i[1] }}</a></h2>
+                    <hr>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+
+      </form>
+    </div>
+
+    <script src="static/image_input_radiobutton.js" type="text/javascript" charset="utf-8"></script>
+
+  </body>
+</html>
