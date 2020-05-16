@@ -23,33 +23,33 @@ def sift_img_descriptor(img, sift_bovw):
 
         keypoints = sift.detect(gray, None)
 
-        # SIFT has feature Size: [Y x 128], where Y represents the number of key-points detected in the current image.
+        # SIFT has feature Size: [X x 128], where X represents the number of key-points detected in the current image
         vector_size = 128  # define the number of key-points and thus make the final size image vector static
 
         # Number of keypoints varies depending on image size and color pallet
         # Sorting keypoints based on keypoint response value (bigger is better)
         # Response, defines how strong a keypoint is according to the formula described by the technique.
         # The higher the value, the more likely the feature will be recognized among several instances of an object.
-        keypoints = sorted(keypoints, key=lambda x: -x.response)[:vector_size]  # select just vector_size=128 keypoints
+        keypoints = sorted(keypoints, key=lambda x: -x.response)[:vector_size]  # select just 128 (vector_size) keypoints
 
-        keypoints, descr = sift.compute(gray, keypoints)
+        keypoints, descriptors = sift.compute(gray, keypoints)
 
         # if the vector of the descriptor is None then return
-        if descr is None:
+        if descriptors is None:
             return None
 
         if sift_bovw == "sift":  # basic version of SIFT
             # Flatten all of them in one big vector - feature vector
-            # descr = descr.flatten()
+            # descriptors = descriptors.flatten()
 
             # Sum each column of all 128 keypoints, resulting in a vector with size 128, containing the
-            descr = descr.sum(axis=0)
-            print("desc_vect_image_1", descr)
+            descriptors = descriptors.sum(axis=0)
+            print("desc_vect_image_1", descriptors)
     except cv2.error as e:
         print('Error: ', e)
         return None
 
-    return descr.astype(float)
+    return descriptors.astype(float)
 
 
 # ======================================================================================================================
@@ -65,11 +65,11 @@ def histogram(image):
     bins = (8, 8, 8)
 
     try:
-        # compute a 3D histogram in the RGB colorspace, then normalize the histogram so that images
-        # with the same content, but either scaled larger or smaller will have (roughly) the same histogram
+        # compute a 3D histogram in the RGB colorspace
         hist = cv2.calcHist([image], [0, 1, 2], None, bins, [0, 256, 0, 256, 0, 256])
 
-        # normalize
+        # normalize the histogram so that images with the same content, but either
+        # scaled larger or smaller will have (roughly) the same histogram
         hist = cv2.normalize(hist, hist)
 
         # Flatten the histogram in one big vector - feature vector
@@ -111,7 +111,7 @@ def build_histogram(image_descriptor, kmeans_model):
         # normalize
         hist = cv2.normalize(hist, hist)
 
-        # Not need to flatten the histogram as it already is one-dimensional (containing vocabulary and counts)
+        # No need to flatten the histogram as it already is one-dimensional (containing vocabulary and counts)
     except cv2.error as e:
         print('Error: ', e)
         return None
@@ -180,7 +180,7 @@ def search_database(query_img_des, database_images, dist_met, k):
     for db_img_vector, db_img_link in database_images:
         db_img_vector = np.array(json.loads(db_img_vector), dtype=float)
         distances.append((distance_metric(query_img_des, db_img_vector, distance=dist_met),
-                          db_img_vector, db_img_link)) #np.array(db_img_vector, dtype=float)
+                          db_img_vector, db_img_link))
 
     # sort results by distance, the lower the distance the better, thus smaller distances are at the beginning of the list
     sorted_distances = sorted(distances, key=lambda x: x[0])
