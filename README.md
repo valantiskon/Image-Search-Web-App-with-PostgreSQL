@@ -1,5 +1,5 @@
 # Image Search Web App with PostgreSQL - Multimedia Database Application  
-##### Online at https://image-search-postgresql.herokuapp.com/ (hosted by Heroku)  
+##### Online at https://image-search-postgresql.herokuapp.com/ (hosted by Heroku - up to 30sec. loading time)  
 
 ##### Database structure (PostgreSQL)  
 <img src="https://github.com/valantiskon/Image-Search-Web-App-with-PostgreSQL/blob/master/README_images/db_structure.png" height="250" >
